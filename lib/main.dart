@@ -24,8 +24,17 @@ class _TodoListWidgetState extends State<TodoListWidget> {
     var data = databaseService.getTodoList();
 
     return Scaffold(
+      backgroundColor: Colors.indigo[100],
       appBar: AppBar(
-        title: Text('TodoList'),
+        title: Text('Todo List'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.laptop,
+              color: Colors.white,
+            ),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -36,6 +45,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                   var subListWidgets = data[index]
                       .subList
                       .map((subItem) => Card(
+                    color: Colors.amber[200],
                             child: CheckboxListTile(
                               title: Text(subItem.text),
                               value: subItem.complete,
@@ -47,19 +57,37 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                           ))
                       .toList();
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(children: [
-                        Text(data[index].text,
-                            style: TextStyle(
-                              decoration: databaseService.isSubTodoDone(data[index]) ? TextDecoration.lineThrough : null,
-                            )),
-                        ElevatedButton(onPressed: (){
-                          databaseService.delete(data[index]);
-                          setState(() {
-
-                          });
-                        }, child: null)
+                        new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.all(10),
+                              child: Icon(Icons.assignment)
+                            ),
+                            Container(
+                              child: Text(data[index].text,
+                                  style: TextStyle(
+                                    decoration: databaseService.isSubTodoDone(data[index]) ? TextDecoration.lineThrough : null,
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.all(10.0),
+                              child: ElevatedButton(
+                                  onPressed: () {
+                                    databaseService.delete(data[index]);
+                                    setState(() {});
+                                  },
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(fontSize: 15.0),
+                                  )),
+                            ),
+                          ],
+                        ),
                       ]),
                       Padding(
                         padding: EdgeInsets.all(15.0),
@@ -69,7 +97,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                           percent: databaseService.calculateSubTodoAffect(data[index]) / 100,
                           center: Text(
                             databaseService.calculateSubTodoAffectString(data[index]),
-                            style: new TextStyle(fontSize: 15.0),
+                            style: new TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold),
                           ),
                           linearStrokeCap: LinearStrokeCap.roundAll,
                           backgroundColor: Colors.grey,
@@ -142,19 +170,22 @@ class _AddTodoWidget extends State<AddTodoWidget> {
         .toList();
 
     return Scaffold(
+      backgroundColor: Colors.indigo[100],
       appBar: AppBar(
-        title: Text("Add new Todo"),
+        title: Text("Add New Todo"),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Image.asset('assets/images/todo1.png'),
           Container(
-            color: Colors.blueGrey,
+            margin: EdgeInsets.all(10),
+            color: Colors.amber[300],
             child: TextField(
+              style: TextStyle(fontSize: 20, color: Colors.black),
               controller: todoTextController,
               textAlign: TextAlign.left,
-              decoration: InputDecoration(border: InputBorder.none, hintText: 'Enter a todo'),
-              cursorColor: Colors.amber,
+              decoration: InputDecoration(border: InputBorder.none, hintText: 'Enter a todo',)
             ),
             padding: EdgeInsets.all(10),
           ),
@@ -163,82 +194,85 @@ class _AddTodoWidget extends State<AddTodoWidget> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: addedSubTodoWidget),
           ),
           Expanded(child: Container()),
-          Container(
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.pressed)) return Colors.blueGrey;
-                    return null; // Use the component's default.
-                  },
+          Column(
+            children: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.pressed)) return Colors.blueGrey;
+                      return null; // Use the component's default.
+                    },
+                  ),
                 ),
+                onPressed: () {
+                  TextEditingController subTodoTextController = TextEditingController();
+                  TextEditingController subTodoAffectController = TextEditingController();
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Container(
+                          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                          child: Column(
+                            children: [
+                              TextField(controller: subTodoTextController, decoration: InputDecoration(hintText: 'Name')),
+                              TextField(
+                                controller: subTodoAffectController,
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(hintText: 'Affect'),
+                              ),
+                              FlatButton(
+                                child: Text('Add SubTodo'),
+                                onPressed: () {
+                                  todo.subList.add(SubTodo()
+                                    ..id = (subTodoId++).toString()
+                                    ..text = subTodoTextController.text
+                                    ..effectOnTodo = int.parse(subTodoAffectController.text)
+                                    ..complete = false);
+                                  setState(() {});
+                                  Navigator.of(context).pop();
+                                },
+                                color: Colors.deepPurple[100],
+                                minWidth: double.infinity,
+                              )
+                            ],
+                          ),
+                        );
+                      });
+                },
+                child: Text('Add a SubTodo'),
               ),
-              onPressed: () {
-                TextEditingController subTodoTextController = TextEditingController();
-                TextEditingController subTodoAffectController = TextEditingController();
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return Container(
-                        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                        child: Column(
-                          children: [
-                            TextField(controller: subTodoTextController, decoration: InputDecoration(hintText: 'Name')),
-                            TextField(
-                              controller: subTodoAffectController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(hintText: 'Affect'),
-                            ),
-                            FlatButton(
-                              child: Text('Add SubTodo'),
-                              onPressed: () {
-                                todo.subList.add(SubTodo()
-                                  ..id = (subTodoId++).toString()
-                                  ..text = subTodoTextController.text
-                                  ..effectOnTodo = int.parse(subTodoAffectController.text)
-                                  ..complete = false);
-                                setState(() {});
-                                Navigator.of(context).pop();
-                              },
-                              color: Colors.red,
-                              minWidth: double.infinity,
-                            )
-                          ],
-                        ),
-                      );
-                    });
-              },
-              child: Text('Add a SubTodo'),
-            ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Back'),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        todo.id = databaseService.getMaxTodoId().toString();
+                        todo.text = todoTextController.text;
+                        databaseService.add(todo);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(
+                        'Add',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          Container(
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.pressed)) return Colors.blueGrey;
-                    return null; // Use the component's default.
-                  },
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Back'),
-            ),
-          ),
-          FlatButton(
-              onPressed: () {
-                todo.id = databaseService.getMaxTodoId().toString();
-                todo.text = todoTextController.text;
-                databaseService.add(todo);
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Add',
-                style: TextStyle(color: Colors.white),
-              ),
-              color: Colors.lightBlueAccent)
         ],
       ),
     );
