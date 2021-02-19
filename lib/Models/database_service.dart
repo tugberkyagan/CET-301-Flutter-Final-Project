@@ -1,6 +1,5 @@
 import 'package:final_todo_app/Models/subTodo.dart';
 import 'package:final_todo_app/Models/todo.dart';
-import 'package:flutter/material.dart';
 
 class DatabaseService {
   static List<Todo> _sources;
@@ -12,14 +11,14 @@ class DatabaseService {
         ..complete = false
         ..text = 'Cet 301 Todo App'
         ..id = '1'
-        ..subIdList = [
+        ..subList = [
           SubTodo()
             ..id = '1'
             ..complete = false
             ..effectOnTodo = 10
             ..text = 'Main Screen',
           SubTodo()
-            ..id = '1'
+            ..id = '2'
             ..complete = false
             ..effectOnTodo = 30
             ..text = 'Database Service'
@@ -28,14 +27,14 @@ class DatabaseService {
         ..complete = false
         ..text = 'Cet 341'
         ..id = '2'
-        ..subIdList = [
+        ..subList = [
           SubTodo()
-            ..id = '1.1'
+            ..id = '1'
             ..complete = false
             ..effectOnTodo = 10
             ..text = 'Concept Map Homework',
           SubTodo()
-            ..id = '1.2'
+            ..id = '2'
             ..complete = false
             ..effectOnTodo = 30
             ..text = 'Storyboard Homework'
@@ -48,7 +47,7 @@ class DatabaseService {
   }
 
   void addSubTodo(Todo todo, SubTodo subTodo) {
-    _sources.where((element) => element == todo).first.subIdList.add(subTodo);
+    _sources.where((element) => element == todo).first.subList.add(subTodo);
   }
 
 
@@ -60,7 +59,7 @@ class DatabaseService {
 
   void updateSubTodo(Todo todo, SubTodo subTodo) {
     var _todo = _sources.firstWhere((element) => element.id == todo.id);
-    _todo.subIdList = _todo.subIdList.map((_subTodo) {
+    _todo.subList = _todo.subList.map((_subTodo) {
       return _subTodo.id == subTodo.id ? subTodo : _subTodo;
     }).toList();
   }
@@ -73,7 +72,7 @@ class DatabaseService {
     _sources
         .where((element) => element == todo)
         .first
-        .subIdList
+        .subList
         .remove(subTodo);
   }
 
@@ -87,7 +86,7 @@ class DatabaseService {
   }
 
   List<SubTodo> getsubTodoList(Todo todo) {
-    return _sources.where((element) => element == todo).first.subIdList;
+    return _sources.where((element) => element == todo).first.subList;
   }
 
   String calculateSubTodoAffectString(Todo todo) {
@@ -97,12 +96,11 @@ class DatabaseService {
   int calculateSubTodoAffect(Todo todo) {
     var _todo = _sources.firstWhere((element) => element.id == todo.id);
     var totalAffect = 0;
-    _todo.subIdList.forEach((element) =>
+    _todo.subList.forEach((element) =>
         !element.complete ? totalAffect += element.effectOnTodo : 0);
     return 100 - totalAffect;
   }
   bool isSubTodoDone(Todo todo){
-    if(calculateSubTodoAffect(todo) == 100) return true;
-    else return false;
+    return calculateSubTodoAffect(todo) == 100 ? true : false;
   }
 }
