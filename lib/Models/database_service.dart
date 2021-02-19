@@ -10,35 +10,35 @@ class DatabaseService {
     _sources = [
       Todo()
         ..complete = false
-        ..text = 'Aybery'
+        ..text = 'Cet 301 Todo App'
         ..id = '1'
         ..subIdList = [
           SubTodo()
-            ..id = '1.1'
+            ..id = '1'
             ..complete = false
             ..effectOnTodo = 10
-            ..text = 'wqe',
+            ..text = 'Main Screen',
           SubTodo()
-            ..id = '1.2'
+            ..id = '1'
             ..complete = false
             ..effectOnTodo = 30
-            ..text = 'qwesad'
+            ..text = 'Database Service'
         ],
       Todo()
         ..complete = false
-        ..text = 'tugbery'
+        ..text = 'Cet 341'
         ..id = '2'
         ..subIdList = [
           SubTodo()
             ..id = '1.1'
             ..complete = false
             ..effectOnTodo = 10
-            ..text = 'wqe',
+            ..text = 'Concept Map Homework',
           SubTodo()
             ..id = '1.2'
             ..complete = false
             ..effectOnTodo = 30
-            ..text = 'qwesad'
+            ..text = 'Storyboard Homework'
         ]
     ];
   }
@@ -50,6 +50,7 @@ class DatabaseService {
   void addSubTodo(Todo todo, SubTodo subTodo) {
     _sources.where((element) => element == todo).first.subIdList.add(subTodo);
   }
+
 
   void update(Todo todo) {
     _sources = _sources.map((_todo) {
@@ -74,6 +75,11 @@ class DatabaseService {
         .first
         .subIdList
         .remove(subTodo);
+  }
+
+  int getMaxTodoId(){
+    _sources.sort((a,b) => int.parse(b.id).compareTo(int.parse(a.id)));
+    return int.parse(_sources.first.id) + 1;
   }
 
   List<Todo> getTodoList() {
